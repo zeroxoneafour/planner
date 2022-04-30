@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Planner</title>
+		<link rel="stylesheet" href="index.css">
+	</head>
+	<body>
+		<div id="topbar">
+			<p class="topbar inline">Viewing week:</p>
+			<input class="inline" type="date" id="mainDate">
+		</div>
+		<div id="main">
+		<!-- Each day is injected into here, Sunday through Saturday, with periods 1-8, via JavaScript -->
+		</div>
+		<div id="newPlanModalOutside" class="modal">
+			<div id="newPlanModal" class="modal-content">
+				<div>
+					<p class="inline">Date:</p>
+					<input class="inline" type="date" id="newDate">
+				</div>
+				<div>
+					<p class="inline">Period:</p>
+					<input class="inline" type="number" id="newPeriod">
+				</div>
+				<div>
+					<p class="inline">Severity:</p>
+					<select class="inline" id="newSeverity">
+						<option value="assignment">Assignment</option>
+						<option value="homework">Homework</option>
+						<option value="quiz">Quiz</option>
+						<option value="test">Test</option>
+						<option value="project">Project</option>
+					</select>
+				</div>
+				<div>
+					<p class="inline">Description:</p>
+					<input class="inline" type="text" id="newDesc">
+				</div>
+				<div>
+					<button class="inline button" onclick="saveNewPlan()">Save</button>
+					<button class="inline button" onclick="closeModal('newPlanModalOutside')">Close</button>
+			</div>
+		</div>
+		<script src="index.js"></script>
+	</body>
+</html>

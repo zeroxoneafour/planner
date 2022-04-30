@@ -1,0 +1,64 @@
+* {
+	font-family: sans-serif;
+}
+
+*.inline {
+	display: inline-block;
+}
+
+*.hidden {
+	display: none;
+}
+
+div.modal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+	background-color: #fefefe;
+	margin: 15% auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+}
+
+html, body {
+	height: 95%;
+}
+
+div#main {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	height: 100%;
+}
+
+div.dayslot {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	margin: auto 10px;
+	border: 2px solid black;
+	width: 100%;
+	height: 100%;
+}
+
+p.dayslot-title {
+	text-align: center;
+}
+
+p.period-title {
+	text-align: center;
+}
+
+p.desc {
+	text-align: center;
+}
