@@ -73,6 +73,10 @@ function saveNewPlan() {
 	let period = document.getElementById("newPeriod").value
 	let severity = document.getElementById("newSeverity").value
 	let desc = document.getElementById("newDesc").value
+	// has to have some description
+	if (desc == "") {
+		return
+	}
 	let plans = readLocalStorageForDate(date)
 	plans.push([period, severity, desc])
 	writeLocalStorageForDate(date, plans)
