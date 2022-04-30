@@ -59,6 +59,7 @@ p.period-title {
 	text-align: center;
 }
 
-p.desc {
+p.plan {
 	text-align: center;
+	display: block;
 }

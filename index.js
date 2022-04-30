@@ -42,15 +42,15 @@ function closeModal(modalId) {
 	document.getElementById(modalId).style.display = "none"
 }
 
-// local storage key:value organization is "<date>\0<number>":"<period>\0<severity>\0<desc>"
+// local storage key:value organization is "<date>:<number>":"<period>\0<severity>\0<desc>"
 // \0 is obviously null
-// ex. "2022-01-07\00":"1\0homework\0Winter Break Homework"
+// ex. "2022-01-07:0":"1\0homework\0Winter Break Homework"
 // is returned as an array of arrays, where the arrays inside the main array are [period, severity, desc]
 function readLocalStorageForDate(date) {
 	dateStr = dateToDay(date)
 	let ret = []
-	for (i = 0; window.localStorage.getItem(dateStr + "\0" + i) != null; i++) {
-		value = window.localStorage.getItem(dateStr + "\0" + i)
+	for (i = 0; window.localStorage.getItem(dateStr + ":" + i) != null; i++) {
+		value = window.localStorage.getItem(dateStr + ":" + i)
 		ret.push(value.split("\0"))
 	}
 	return ret
@@ -59,9 +59,11 @@ function readLocalStorageForDate(date) {
 // takes a date string (YYYY-MM-DD) and a plans array
 function writeLocalStorageForDate(date, plans) {
 	dateStr = dateToDay(date)
-	window.localStorage.clear()
+	for (i = 0; window.localStorage.getItem(dateStr + ":" + i) != null; i++) {
+		window.localStorage.removeItem(dateStr + ":" + i)
+	}
 	for (i = 0; i < plans.length; i++) {
-		window.localStorage.setItem(dateStr + "\0" + i, plans[i].join("\0"))
+		window.localStorage.setItem(dateStr + ":" + i, plans[i].join("\0"))
 	}
 }
 
@@ -93,7 +95,11 @@ function rebuildMain() {
 		// day slot
 		let newDaySlot = document.createElement("div")
 		newDaySlot.classList.add("dayslot")
-		newDaySlot.addEventListener("click", function() {
+		newDaySlot.addEventListener("click", function(event) {
+			// make sure it doesn't override clicks on child elements, but allow clicks on the title
+			if (event.target != this && !(event.target.classList[0] == "dayslot-title")) {
+				return
+			}
 			let date = new Date()
 			date.setTime(this.querySelector(".time").innerHTML)
 			openNewPlanModal(date)
@@ -112,10 +118,9 @@ function rebuildMain() {
 		// actually create the plans now
 		let plans = readLocalStorageForDate(currentDate)
 		for (let j = 0; j < plans.length; j++) {
-			let plan = document.createElement("div")
-			let desc = document.createElement("p")
-
+			let plan = document.createElement("p")
 			let period = newDaySlot.querySelector(".period-" + plans[j][0])
+
 			if (period === null) {
 				period = document.createElement("div")
 				periodTitle = document.createElement("p")
@@ -123,20 +128,43 @@ function rebuildMain() {
 				periodTitle.classList.add("period-title")
 				periodTitle.innerHTML = "Period " + plans[j][0]
 				period.appendChild(periodTitle)
+
+				// add assignments directly to pre-created periods
+				period.addEventListener("click", function(event) {
+					if (event.target != this && !(event.target.classList[0] == "period-title")) {
+						return
+					}
+					let date = new Date()
+					date.setTime(this.parentElement.querySelector(".time").innerHTML)
+					let periodNumber = this.querySelector(".period-title").innerHTML.split(" ")[1] // hey, it works
+					openNewPlanModal(date, periodNumber)
+				})
+
 				newDaySlot.appendChild(period)
 			}
-			desc.innerHTML = plans[j][2]
 
+			plan.innerHTML = plans[j][2]
 			plan.classList.add("severity-" + plans[j][1])
-			desc.classList.add("desc")
+			plan.classList.add("plan")
+			
+			// metadata about the assignment
+			let metadata = document.createElement("p")
+			metadata.innerHTML = [dateToDay(currentDate), j].join(":")
+			metadata.classList.add("hidden")
+			metadata.classList.add("metadata")
+			plan.appendChild(metadata)
+			// delete plan when clicked
+			plan.addEventListener("dblclick", function() {window.localStorage.removeItem(this.querySelector(".metadata").innerHTML); rebuildMain()})
 
-			plan.appendChild(desc)
 			period.appendChild(plan)
 		}
 
 		main.appendChild(newDaySlot)
 		currentDate.setDate(currentDate.getDate()+1)
 	}
+}
+
+function deletePlanForDesc(descElement) {
 }
 
 document.getElementById("mainDate").value = dateToDay(mainDate)
