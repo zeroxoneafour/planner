@@ -1,5 +1,6 @@
 let mainDate = new Date()
 let sundayDate = mainDate // is used and set later
+const params = new URLSearchParams(location.search) // search params for adding new assignments in batch
 
 // convert date to YYYY-MM-DD
 function dateToDay(date) {
@@ -168,7 +169,21 @@ function rebuildMain() {
 	}
 }
 
-function deletePlanForDesc(descElement) {
+// handle params, possible params are documented in readme
+if (params.get("date") != null) {
+	let date = dayToDate(params.get("date"))
+	let period = params.get("period")
+	let severity = params.get("severity")
+	let desc = params.get("desc")
+	if (period != null && severity != null && desc != null) {
+		if (params.get("noconfirm") == "true") {
+			let plans = readLocalStorageForDate(date)
+			plans.push([period, severity, desc])
+			writeLocalStorageForDate(date, plans)
+		} else {
+			openNewPlanModal(date, period, severity, desc)
+		}
+	}
 }
 
 document.getElementById("mainDate").value = dateToDay(mainDate)
