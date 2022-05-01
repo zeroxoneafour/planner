@@ -217,7 +217,9 @@ function rebuildMain() {
 
 		// makes sure periods are in order from least to greatest
 		for (let j = 0; j < periods.length; j++) {
-			main.appendChild(periods[j])
+			if (periods[j] != null) {
+				main.appendChild(periods[j])
+			}
 		}
 
 		main.appendChild(newDaySlot)
