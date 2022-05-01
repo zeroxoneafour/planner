@@ -4,15 +4,15 @@ const params = new URLSearchParams(location.search) // search params for adding 
 
 // convert date to YYYY-MM-DD
 function dateToDay(date) {
-	year = date.getFullYear().toString()
+	let year = date.getFullYear().toString()
 	while (year.length < 4) {
 		year = "0" + year
 	}
-	month = (date.getMonth() + 1).toString()
+	let month = (date.getMonth() + 1).toString()
 	while (month.length < 2) {
 		month = "0" + month
 	}
-	day = date.getDate().toString()
+	let day = date.getDate().toString()
 	while (day.length < 2) {
 		day = "0" + day
 	}
@@ -30,10 +30,10 @@ function dayToDate(day) {
 }
 
 // severity levels go - assignment, homework, quiz, test, project
-function openNewPlanModal(date = mainDate, period = 1, severity = "assignment", desc = "") {
+function openNewPlanModal(date = dateToDay(mainDate), period = 1, severity = "assignment", desc = "") {
 	let modalOutside = document.getElementById("newPlanModalOutside")
 	modalOutside.style.display = "block"
-	document.getElementById("newDate").value = dateToDay(date)
+	document.getElementById("newDate").value = date
 	document.getElementById("newPeriod").value = period
 	document.getElementById("newSeverity").value = severity
 	document.getElementById("newDesc").value = desc
@@ -48,10 +48,9 @@ function closeModal(modalId) {
 // ex. "2022-01-07:0":"1\0homework\0Winter Break Homework"
 // is returned as an array of arrays, where the arrays inside the main array are [period, severity, desc]
 function readLocalStorageForDate(date) {
-	dateStr = dateToDay(date)
 	let ret = []
-	for (i = 0; window.localStorage.getItem(dateStr + ":" + i) != null; i++) {
-		value = window.localStorage.getItem(dateStr + ":" + i)
+	for (i = 0; window.localStorage.getItem(date + ":" + i) != null; i++) {
+		value = window.localStorage.getItem(date + ":" + i)
 		ret.push(value.split("\0"))
 	}
 	return ret
@@ -59,18 +58,26 @@ function readLocalStorageForDate(date) {
 
 // takes a date string (YYYY-MM-DD) and a plans array
 function writeLocalStorageForDate(date, plans) {
-	dateStr = dateToDay(date)
-	for (i = 0; window.localStorage.getItem(dateStr + ":" + i) != null; i++) {
-		window.localStorage.removeItem(dateStr + ":" + i)
+	for (i = 0; window.localStorage.getItem(date + ":" + i) != null; i++) {
+		window.localStorage.removeItem(date + ":" + i)
 	}
 	for (i = 0; i < plans.length; i++) {
-		window.localStorage.setItem(dateStr + ":" + i, plans[i].join("\0"))
+		window.localStorage.setItem(date + ":" + i, plans[i].join("\0"))
 	}
+	rebuildMain()
+}
+
+// delete an element in the plans array by getting the localStorage key, then rebuild main
+function deletePlan(planStr) {
+	let plan = planStr.split(":")
+	let plans = readLocalStorageForDate(plan[0])
+	plans.splice(plan[1], 1)
+	writeLocalStorageForDate(plan[0], plans)
 }
 
 // save new plan
 function saveNewPlan() {
-	let date = dayToDate(document.getElementById("newDate").value)
+	let date = document.getElementById("newDate").value
 	let period = document.getElementById("newPeriod").value
 	let severity = document.getElementById("newSeverity").value
 	let desc = document.getElementById("newDesc").value
@@ -97,6 +104,7 @@ function rebuildMain() {
 		currentDate.setDate(currentDate.getDate()-1)
 	}
 	for (let i = 0; i < 7; i++) {
+		let currentDateStr = dateToDay(currentDate)
 		// day slot
 		let newDaySlot = document.createElement("div")
 		newDaySlot.classList.add("dayslot")
@@ -105,9 +113,7 @@ function rebuildMain() {
 			if (event.target != this && !(event.target.classList[0] == "dayslot-title")) {
 				return
 			}
-			let date = new Date()
-			date.setTime(this.querySelector(".time").innerHTML)
-			openNewPlanModal(date)
+			openNewPlanModal(this.querySelector(".time").innerHTML)
 		})
 		// day slot title
 		let title = document.createElement("p")
@@ -116,12 +122,12 @@ function rebuildMain() {
 		newDaySlot.appendChild(title)
 		// store information about the time inside the HTML, because y'know, why not
 		let time = document.createElement("p")
-		time.innerHTML = currentDate.getTime()
+		time.innerHTML = currentDateStr
 		time.classList.add("hidden")
 		time.classList.add("time")
 		newDaySlot.appendChild(time)
 		// actually create the plans now
-		let plans = readLocalStorageForDate(currentDate)
+		let plans = readLocalStorageForDate(currentDateStr)
 		for (let j = 0; j < plans.length; j++) {
 			let plan = document.createElement("p")
 			let period = newDaySlot.querySelector(".period-" + plans[j][0])
@@ -139,8 +145,7 @@ function rebuildMain() {
 					if (event.target != this && !(event.target.classList[0] == "period-title")) {
 						return
 					}
-					let date = new Date()
-					date.setTime(this.parentElement.querySelector(".time").innerHTML)
+					let date = this.parentElement.querySelector(".time").innerHTML
 					let periodNumber = this.querySelector(".period-title").innerHTML.split(" ")[1] // hey, it works
 					openNewPlanModal(date, periodNumber)
 				})
@@ -154,12 +159,12 @@ function rebuildMain() {
 			
 			// metadata about the assignment
 			let metadata = document.createElement("p")
-			metadata.innerHTML = [dateToDay(currentDate), j].join(":")
+			metadata.innerHTML = [currentDateStr, j].join(":")
 			metadata.classList.add("hidden")
 			metadata.classList.add("metadata")
 			plan.appendChild(metadata)
 			// delete plan when clicked
-			plan.addEventListener("dblclick", function() {window.localStorage.removeItem(this.querySelector(".metadata").innerHTML); rebuildMain()})
+			plan.addEventListener("dblclick", function() {deletePlan(this.querySelector(".metadata").innerHTML)})
 
 			period.appendChild(plan)
 		}

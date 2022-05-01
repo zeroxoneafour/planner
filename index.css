@@ -60,6 +60,30 @@ p.period-title {
 }
 
 p.plan {
+	margin: 4px;
+	border: 2px solid black;
+	padding: 4px;
 	text-align: center;
 	display: block;
+}
+
+p.severity-assignment {
+	background-color: lightgray;
+}
+
+p.severity-homework {
+	background-color: yellow;
+}
+
+p.severity-quiz {
+	background-color: coral;
+}
+
+p.severity-test {
+	background-color: orangered;
+}
+
+p.severity-project {
+	color: white;
+	background-color: dimgray;
 }
