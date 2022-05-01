@@ -150,7 +150,7 @@ function rebuildMain() {
 			let planDesc = document.createElement("p")
 			let period = periods[plans[j][0]]
 
-			if (period === null) {
+			if (period == null) {
 				period = document.createElement("div")
 				periodTitle = document.createElement("p")
 				period.classList.add("period-" + plans[j][0])
