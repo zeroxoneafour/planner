@@ -144,10 +144,11 @@ function rebuildMain() {
 		newDaySlot.appendChild(time)
 		// actually create the plans now
 		let plans = readLocalStorageForDate(currentDateStr)
+		let periods = []
 		for (let j = 0; j < plans.length; j++) {
 			let plan = document.createElement("div")
 			let planDesc = document.createElement("p")
-			let period = newDaySlot.querySelector(".period-" + plans[j][0])
+			let period = periods[plans[j][0]]
 
 			if (period === null) {
 				period = document.createElement("div")
@@ -167,7 +168,7 @@ function rebuildMain() {
 					openNewPlanModal(date, periodNumber)
 				})
 
-				newDaySlot.appendChild(period)
+				periods[plans[j][0]] = period
 			}
 
 			planDesc.innerHTML = plans[j][2]
@@ -212,6 +213,11 @@ function rebuildMain() {
 			plan.appendChild(planDesc)
 
 			period.appendChild(plan)
+		}
+
+		// makes sure periods are in order from least to greatest
+		for (let j = 0; j < periods.length; j++) {
+			main.appendChild(periods[j])
 		}
 
 		main.appendChild(newDaySlot)
