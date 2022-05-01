@@ -221,7 +221,7 @@ function rebuildMain() {
 
 // handle params, possible params are documented in readme
 if (params.get("date") != null) {
-	let date = dayToDate(params.get("date"))
+	let date = params.get("date")
 	let period = params.get("period")
 	let severity = params.get("severity")
 	let desc = params.get("desc")
