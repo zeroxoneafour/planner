@@ -59,31 +59,55 @@ p.period-title {
 	text-align: center;
 }
 
-p.plan {
+div.plan {
 	margin: 4px;
 	border: 2px solid black;
 	padding: 4px;
-	text-align: center;
 	display: block;
+	position: relative;
 }
 
-p.severity-assignment {
+p.plan {
+	text-align: center;
+}
+
+div.severity-assignment {
 	background-color: lightgray;
 }
 
-p.severity-homework {
+div.severity-homework {
 	background-color: yellow;
 }
 
-p.severity-quiz {
+div.severity-quiz {
 	background-color: coral;
 }
 
-p.severity-test {
+div.severity-test {
 	background-color: orangered;
 }
 
-p.severity-project {
+div.severity-project {
 	color: white;
 	background-color: dimgray;
+}
+
+div.plan-button-list {
+	position: absolute;
+	display: block;
+	right: 4px;
+	top: 0px;
+}
+
+button.plan-button {
+	opacity: 0.3;
+	background-color: rgba(0, 0, 0, 0);
+	border-width: 0px;
+	font-size: 24px;
+	padding: 0px;
+	transition-duration: 0.25s;
+}
+
+button.plan-button:hover {
+	opacity: 0.8;
 }

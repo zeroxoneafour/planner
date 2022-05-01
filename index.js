@@ -67,6 +67,22 @@ function writeLocalStorageForDate(date, plans) {
 	rebuildMain()
 }
 
+// takes a planStr (like 2022-04-28:0) and puts the link to generate it into your clipboard
+function copyPlan(planStr) {
+	let plan = window.localStorage.getItem(planStr).split("\0")
+	let date = planStr.split(":")[0]
+	let period = plan[0]
+	let severity = plan[1]
+	let desc = plan[2]
+	let link = location.origin + location.pathname + "?"
+	link += "date=" + date
+	link += "&period=" + period
+	link += "&severity=" + severity
+	link += "&desc=" + desc
+	link += "&noconfirm=true"
+	navigator.clipboard.writeText(link)
+}
+
 // delete an element in the plans array by getting the localStorage key, then rebuild main
 function deletePlan(planStr) {
 	let plan = planStr.split(":")
@@ -129,7 +145,8 @@ function rebuildMain() {
 		// actually create the plans now
 		let plans = readLocalStorageForDate(currentDateStr)
 		for (let j = 0; j < plans.length; j++) {
-			let plan = document.createElement("p")
+			let plan = document.createElement("div")
+			let planDesc = document.createElement("p")
 			let period = newDaySlot.querySelector(".period-" + plans[j][0])
 
 			if (period === null) {
@@ -153,7 +170,8 @@ function rebuildMain() {
 				newDaySlot.appendChild(period)
 			}
 
-			plan.innerHTML = plans[j][2]
+			planDesc.innerHTML = plans[j][2]
+			planDesc.classList.add("plan")
 			plan.classList.add("severity-" + plans[j][1])
 			plan.classList.add("plan")
 			
@@ -162,9 +180,36 @@ function rebuildMain() {
 			metadata.innerHTML = [currentDateStr, j].join(":")
 			metadata.classList.add("hidden")
 			metadata.classList.add("metadata")
+
+			// control buttons for the plan
+			let buttons = document.createElement("div")
+			let copyButton = document.createElement("button")
+			let deleteButton = document.createElement("button")
+			// icons
+			copyButton.innerHTML = "⎘"
+			deleteButton.innerHTML = "×"
+			copyButton.title = "Copy Assignment Link"
+			deleteButton.title = "Delete Assignment"
+			// css
+			buttons.classList.add("plan-button-list")
+			copyButton.classList.add("plan-button")
+			deleteButton.classList.add("plan-button")
+			// event listeners
+			copyButton.addEventListener("click", function() {
+				let metadata = this.parentElement.parentElement.querySelector(".metadata")
+				copyPlan(metadata.innerHTML)
+			})
+			deleteButton.addEventListener("click", function() {
+				let metadata = this.parentElement.parentElement.querySelector(".metadata")
+				deletePlan(metadata.innerHTML)
+			})
+
+			buttons.appendChild(copyButton)
+			buttons.appendChild(deleteButton)
+
 			plan.appendChild(metadata)
-			// delete plan when clicked
-			plan.addEventListener("dblclick", function() {deletePlan(this.querySelector(".metadata").innerHTML)})
+			plan.appendChild(buttons)
+			plan.appendChild(planDesc)
 
 			period.appendChild(plan)
 		}
